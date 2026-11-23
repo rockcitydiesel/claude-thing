@@ -1,0 +1,13 @@
+# Car Thing (superbird-debian-kiosk) USB RNDIS link. The device is 192.168.7.2
+# and expects its host at 192.168.7.1. Sorts before 20-ethernet.network, which
+# would otherwise try DHCP on this interface.
+[Match]
+Driver=rndis_host cdc_ether
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+Address=192.168.7.1/24
+LinkLocalAddressing=no
+IPv6AcceptRA=no
