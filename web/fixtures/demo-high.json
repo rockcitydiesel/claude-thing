@@ -1,0 +1,249 @@
+{
+ "now": 1795470000000,
+ "sessions": [
+  {
+   "id": "s-car-dash",
+   "pid": 1,
+   "folder": "car-dash",
+   "cwd": "/home/you/code/car-dash",
+   "name": "car-thing-claude-dashboard",
+   "status": "working",
+   "statusSince": 1795469960000,
+   "startedAt": 1795466400000,
+   "model": "claude-opus-5-5",
+   "context": {
+    "used": 214000,
+    "window": 1000000,
+    "pct": 21
+   },
+   "cost": {
+    "usd": 6.42,
+    "tokens": {
+     "input": 320,
+     "output": 61000,
+     "cacheRead": 9800000,
+     "cacheWrite": 0,
+     "cacheWrite1h": 240000
+    }
+   },
+   "agents": [
+    {
+     "id": "a1",
+     "type": "Explore",
+     "description": "Find where Chromium kiosk reads its start URL on the device image",
+     "startedAt": 1795469958000,
+     "lastActivity": 1795469997000,
+     "context": {
+      "used": 38000,
+      "window": 1000000,
+      "pct": 4
+     }
+    },
+    {
+     "id": "a2",
+     "type": "feature-dev:code-reviewer",
+     "description": "Review server diff",
+     "startedAt": 1795469870000,
+     "lastActivity": 1795469999000,
+     "context": {
+      "used": 91000,
+      "window": 1000000,
+      "pct": 9
+     }
+    },
+    {
+     "id": "a3",
+     "type": "general-purpose",
+     "description": "Write button forwarder",
+     "startedAt": 1795469695000,
+     "lastActivity": 1795469992000,
+     "context": {
+      "used": 12000,
+      "window": 1000000,
+      "pct": 1
+     }
+    }
+   ],
+   "agentCount": 3,
+   "lastActivity": 1795469999000,
+   "recentTools": [
+    {
+     "name": "Read",
+     "summary": "server/http.js",
+     "ts": 1795469950000
+    },
+    {
+     "name": "Edit",
+     "summary": "server/http.js",
+     "ts": 1795469956000
+    },
+    {
+     "name": "Bash",
+     "summary": "Run the test suite",
+     "ts": 1795469970000
+    },
+    {
+     "name": "Agent",
+     "summary": "Review server diff",
+     "ts": 1795469870000
+    },
+    {
+     "name": "Bash",
+     "summary": "Restart the user service",
+     "ts": 1795469996000
+    }
+   ]
+  },
+  {
+   "id": "s-gif-studio",
+   "pid": 2,
+   "folder": "gif-studio",
+   "cwd": "/home/you/code/gif-studio",
+   "name": "gif-export-quality-presets",
+   "status": "your_turn",
+   "statusSince": 1795469925000,
+   "startedAt": 1795462800000,
+   "model": "claude-sonnet-5-5",
+   "context": {
+    "used": 88000,
+    "window": 1000000,
+    "pct": 9
+   },
+   "cost": {
+    "usd": 1.18,
+    "tokens": {
+     "input": 90,
+     "output": 22000,
+     "cacheRead": 3100000,
+     "cacheWrite": 0,
+     "cacheWrite1h": 120000
+    }
+   },
+   "agents": [],
+   "agentCount": 0,
+   "lastActivity": 1795469925000,
+   "recentTools": [
+    {
+     "name": "Bash",
+     "summary": "npm run build",
+     "ts": 1795469800000
+    },
+    {
+     "name": "Edit",
+     "summary": "src/export/presets.ts",
+     "ts": 1795469850000
+    },
+    {
+     "name": "Bash",
+     "summary": "npm test",
+     "ts": 1795469910000
+    }
+   ]
+  },
+  {
+   "id": "s-bike-tracker",
+   "pid": 3,
+   "folder": "bike-tracker",
+   "cwd": "/home/you/code/bike-tracker",
+   "name": "ride-stats-weekly-summary",
+   "status": "idle",
+   "statusSince": 1795464600000,
+   "startedAt": 1794670000000,
+   "model": "claude-opus-5-5",
+   "context": {
+    "used": 921000,
+    "window": 1000000,
+    "pct": 92
+   },
+   "cost": {
+    "usd": 27.5,
+    "tokens": {
+     "input": 15728,
+     "output": 610260,
+     "cacheRead": 87898697,
+     "cacheWrite": 0,
+     "cacheWrite1h": 377400
+    }
+   },
+   "agents": [],
+   "agentCount": 0,
+   "lastActivity": 1795464600000,
+   "recentTools": [
+    {
+     "name": "Bash",
+     "summary": "git push origin ops/approvals",
+     "ts": 1795464500000
+    },
+    {
+     "name": "Edit",
+     "summary": "apps/web/src/admin/approvals.tsx",
+     "ts": 1795464400000
+    }
+   ]
+  },
+  {
+   "id": "s-obby-game",
+   "pid": 4,
+   "folder": "obby-game",
+   "cwd": "/home/you/code/obby-game",
+   "name": "obby-checkpoint-saving",
+   "status": "working",
+   "statusSince": 1795469991000,
+   "startedAt": 1795469400000,
+   "model": "claude-haiku-5-5",
+   "context": {
+    "used": 23000,
+    "window": 1000000,
+    "pct": 2
+   },
+   "cost": {
+    "usd": 0.04,
+    "tokens": {
+     "input": 4000,
+     "output": 9000,
+     "cacheRead": 180000,
+     "cacheWrite": 0,
+     "cacheWrite1h": 30000
+    }
+   },
+   "agents": [
+    {
+     "id": "r1",
+     "type": "Explore",
+     "description": "Locate DataStore usage",
+     "startedAt": 1795469980000,
+     "lastActivity": 1795469998000,
+     "context": {
+      "used": 9000,
+      "window": 1000000,
+      "pct": 1
+     }
+    }
+   ],
+   "agentCount": 1,
+   "lastActivity": 1795469998000,
+   "recentTools": [
+    {
+     "name": "Grep",
+     "summary": "DataStoreService",
+     "ts": 1795469980000
+    }
+   ]
+  }
+ ],
+ "plan": {
+  "status": "ok",
+  "session": {
+   "pct": 94,
+   "resetsAt": 1795472280000.0
+  },
+  "weekly": [
+   {
+    "label": "All models",
+    "pct": 71,
+    "resetsAt": 1795573680000.0
+   }
+  ],
+  "fetchedAt": 1795469980000
+ }
+}

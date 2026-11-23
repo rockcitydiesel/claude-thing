@@ -1,0 +1,16 @@
+{
+ "now": 1795470000000,
+ "sessions": [],
+ "plan": {
+  "status": "ok",
+  "session": null,
+  "weekly": [
+   {
+    "label": "All models",
+    "pct": 14,
+    "resetsAt": 1795781040000.0
+   }
+  ],
+  "fetchedAt": 1795469980000
+ }
+}

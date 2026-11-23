@@ -1,0 +1,11 @@
+{
+  "name": "claude-thing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Car Thing dashboard for Claude Code sessions",
+  "scripts": {
+    "test": "node --test --test-timeout=5000 --test-force-exit \"test/*.test.js\"",
+    "start": "node server/main.js"
+  }
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Claude Thing dashboard server (Car Thing)
+After=network.target
+
+[Service]
+ExecStart=@NODE@ @ROOT@/server/main.js
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
