@@ -15,6 +15,13 @@ IMAGE="$(find "$ROOT/.tools/image" -mindepth 1 -maxdepth 1 -type d -name 'debian
 # superbird-tool opens images/*.bin relative to its own directory.
 cd "$(dirname "$TOOL")"
 
+# Partition erases take longer than pyusb's 1 s default read timeout (worse behind a
+# USB hub), which aborts the flash with USBTimeoutError. Give erases 60 s.
+if ! grep -q "CLAUDE_THING_ERASE_TIMEOUT" superbird_device.py; then
+  sed -i 's/resp = self.device.bulkCmd(command)/resp = self.device.bulkCmd(command, timeout=(60000 if "erase" in command else None))  # CLAUDE_THING_ERASE_TIMEOUT/' superbird_device.py
+fi
+grep -q "CLAUDE_THING_ERASE_TIMEOUT" superbird_device.py || { echo "Could not apply erase-timeout patch"; exit 1; }
+
 echo "Looking for the Car Thing (hold buttons 1+4 while plugging in, no USB hub)..."
 OUT="$("$PY" "$TOOL" --find_device 2>&1 || true)"
 echo "$OUT"
