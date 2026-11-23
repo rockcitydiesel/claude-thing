@@ -9,3 +9,4 @@ export const AUTOJUMP_IDLE_MS = 30_000;
 export const POLL_MS = 1000;
 export const DEFAULT_WINDOW = 200_000;
 export const LARGE_WINDOW = 1_000_000;
+export const STALE_AGENT_MS = 600_000;

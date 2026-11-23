@@ -21,8 +21,10 @@ function toolSummary(input = {}) {
 }
 
 export class TranscriptTail {
-  constructor(path) {
+  // agent: true for subagent transcripts, whose lines are all isSidechain.
+  constructor(path, { agent = false } = {}) {
     this.path = path;
+    this.agent = agent;
     this.reset();
   }
 
@@ -81,7 +83,7 @@ export class TranscriptTail {
     const write = u.cache_creation_input_tokens ?? 0;
     const write1h = u.cache_creation?.ephemeral_1h_input_tokens ?? 0;
     const used = (u.input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0) + write;
-    if (!e.isSidechain) {
+    if (this.agent || !e.isSidechain) {
       this.contextUsed = used;
       if (m.model && m.model !== '<synthetic>') this.model = m.model;
     }
