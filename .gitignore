@@ -2,3 +2,4 @@ node_modules/
 .tools/
 shots/
 .superpowers/
+__pycache__/

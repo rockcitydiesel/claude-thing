@@ -2,10 +2,10 @@
  "now": 1795470000000,
  "sessions": [
   {
-   "id": "s-claude-thing",
+   "id": "s-car-dash",
    "pid": 1,
-   "folder": "claude-thing",
-   "cwd": "/home/vinh/code/claude-thing",
+   "folder": "car-dash",
+   "cwd": "/home/you/code/car-dash",
    "name": "car-thing-claude-dashboard",
    "status": "working",
    "statusSince": 1795469960000,
@@ -95,10 +95,10 @@
    ]
   },
   {
-   "id": "s-jiffer",
+   "id": "s-gif-studio",
    "pid": 2,
-   "folder": "jiffer",
-   "cwd": "/home/vinh/code/jiffer",
+   "folder": "gif-studio",
+   "cwd": "/home/you/code/gif-studio",
    "name": "gif-export-quality-presets",
    "status": "your_turn",
    "statusSince": 1795469925000,
@@ -141,11 +141,11 @@
    ]
   },
   {
-   "id": "s-tempovelo",
+   "id": "s-bike-tracker",
    "pid": 3,
-   "folder": "tempovelo",
-   "cwd": "/home/vinh/code/tempovelo",
-   "name": "ops-automation-approve-gated-agents",
+   "folder": "bike-tracker",
+   "cwd": "/home/you/code/bike-tracker",
+   "name": "ride-stats-weekly-summary",
    "status": "idle",
    "statusSince": 1795464600000,
    "startedAt": 1794670000000,
@@ -182,10 +182,10 @@
    ]
   },
   {
-   "id": "s-roblox",
+   "id": "s-obby-game",
    "pid": 4,
-   "folder": "roblox-lab",
-   "cwd": "/home/vinh/code/roblox-lab",
+   "folder": "obby-game",
+   "cwd": "/home/you/code/obby-game",
    "name": "obby-checkpoint-saving",
    "status": "working",
    "statusSince": 1795469991000,

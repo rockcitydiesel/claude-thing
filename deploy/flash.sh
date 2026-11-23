@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Flash superbird-debian-kiosk v2.0 (landscape) onto a Car Thing in USB burn mode.
 # Run as root:  sudo bash deploy/flash.sh
-# Prep (as your user, no root): .tools/superbird-tool, .tools/venv, .tools/image/<extracted>.
+# Run deploy/prepare-flash.sh first (as your user, no root).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TOOL="$ROOT/.tools/superbird-tool/superbird_tool.py"
@@ -9,7 +9,7 @@ PY="$ROOT/.tools/venv/bin/python"
 IMAGE="$(find "$ROOT/.tools/image" -mindepth 1 -maxdepth 1 -type d -name 'debian_bullseye_arm64_*landscape*' | head -1)"
 
 [[ $EUID -eq 0 ]] || { echo "Run with sudo: sudo bash $0"; exit 1; }
-[[ -x "$PY" && -f "$TOOL" ]] || { echo "Missing .tools/venv or superbird-tool; run the prep steps first."; exit 1; }
+[[ -x "$PY" && -f "$TOOL" ]] || { echo "Missing .tools/; run deploy/prepare-flash.sh first."; exit 1; }
 [[ -n "$IMAGE" && -f "$IMAGE/system_a.ext2" ]] || { echo "Extracted landscape image not found under .tools/image/"; exit 1; }
 
 # superbird-tool opens images/*.bin relative to its own directory.

@@ -35,7 +35,7 @@ test('pidMatches compares /proc start time', async () => {
 });
 
 test('transcriptPath maps cwd to project dir', () => {
-  assert.equal(transcriptPath('/c', '/home/vinh/code', 'abc'), '/c/projects/-home-vinh-code/abc.jsonl');
+  assert.equal(transcriptPath('/c', '/home/you/code', 'abc'), '/c/projects/-home-you-code/abc.jsonl');
 });
 
 test('readAgents reads meta files with finished flags', async () => {
