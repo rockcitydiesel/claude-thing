@@ -230,5 +230,25 @@
     }
    ]
   }
- ]
+ ],
+ "plan": {
+  "status": "ok",
+  "session": {
+   "pct": 23,
+   "resetsAt": 1795478040000.0
+  },
+  "weekly": [
+   {
+    "label": "All models",
+    "pct": 14,
+    "resetsAt": 1795781040000.0
+   },
+   {
+    "label": "Fable",
+    "pct": 13,
+    "resetsAt": 1795781040000.0
+   }
+  ],
+  "fetchedAt": 1795469980000
+ }
 }

@@ -6,6 +6,7 @@ import { CLAUDE_DIR, PORT, USB_ADDR, POLL_MS } from './config.js';
 import { SnapshotBuilder } from './snapshot.js';
 import { createApp } from './http.js';
 import { focusSession } from './focus.js';
+import { UsagePoller, USAGE_POLL_MS } from './usage.js';
 
 export function hasAddress(ifaces, addr) {
   return Object.values(ifaces).some((list) => list?.some((i) => i.address === addr));
@@ -24,7 +25,11 @@ function listen(handler, host) {
 
 async function main() {
   const builder = new SnapshotBuilder(CLAUDE_DIR);
-  let snapshot = await builder.build(Date.now());
+  const usage = new UsagePoller();
+  await usage.poll();
+  setInterval(() => usage.poll(), USAGE_POLL_MS);
+  const withPlan = (snap) => ({ ...snap, plan: usage.current });
+  let snapshot = withPlan(await builder.build(Date.now()));
   const app = createApp({
     getSnapshot: () => snapshot,
     focus: focusSession,
@@ -55,7 +60,7 @@ async function main() {
     if (building) return;
     building = true;
     try {
-      snapshot = await builder.build(Date.now());
+      snapshot = withPlan(await builder.build(Date.now()));
       app.broadcastSnapshot(snapshot);
     } catch (err) {
       console.error('snapshot failed', err);

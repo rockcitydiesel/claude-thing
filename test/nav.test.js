@@ -88,3 +88,10 @@ test('onKey does not mutate input nav', () => {
   key(n, 'RIGHT');
   assert.equal(n.view, 'home');
 });
+
+test('plan usage changes alone do not move navigation', () => {
+  const a = { ...SNAP, plan: { status: 'ok', session: { pct: 1 } } };
+  const b = { ...SNAP, plan: { status: 'ok', session: { pct: 2 } } };
+  const n = onSnapshot(at('B'), a, b, NOW);
+  assert.deepEqual([n.view, n.sessionId], ['session', 'B']);
+});

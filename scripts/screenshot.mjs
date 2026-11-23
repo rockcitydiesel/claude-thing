@@ -9,6 +9,8 @@ fs.mkdirSync(out, { recursive: true });
 
 const shots = {
   'home': '?fixture=demo',
+  'home-high-usage': '?fixture=demo-high',
+  'home-no-session-window': '?fixture=demo-nosession',
   'session-working': '?fixture=demo&view=session&i=0',
   'session-your-turn-alert': '?fixture=demo&view=session&i=1&alert',
   'session-idle-redline': '?fixture=demo&view=session&i=2',

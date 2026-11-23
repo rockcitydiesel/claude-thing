@@ -51,9 +51,41 @@ function segments(pct, count, cls = 'segments') {
 
 const alerting = (id) => (nav.alerts[id] ?? 0) > now();
 
+function resetsIn(t) {
+  if (!t) return '';
+  const mins = Math.max(0, Math.round((t - now()) / 60000));
+  if (mins < 60) return `resets in ${mins}m`;
+  if (mins < 24 * 60) return `resets at ${new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  return `resets ${new Date(t).toLocaleDateString([], { weekday: 'short' })} ${new Date(t).toLocaleTimeString([], { hour: 'numeric' })}`;
+}
+
+function meter(label, m, emptyText) {
+  if (!m) return `<div class="meter"><div class="meter-top"><span class="label">${label}</span><span class="dim-text">${emptyText}</span></div>
+    ${segments(0, 25)}<div class="meter-sub">&nbsp;</div></div>`;
+  const red = m.pct >= 90 ? ' red' : '';
+  return `<div class="meter"><div class="meter-top"><span class="label">${esc(label)}</span><span class="pct${red}">${m.pct}%</span></div>
+    ${segments(m.pct, 25)}<div class="meter-sub">${resetsIn(m.resetsAt)}</div></div>`;
+}
+
+const PLAN_NOTE = {
+  expired: 'Usage paused: Claude login expired. Open any Claude Code session to renew it.',
+  'no-login': 'Usage unavailable: not signed in to Claude Code.',
+  error: 'Usage could not be updated',
+};
+
+function renderPlan() {
+  const p = snap.plan;
+  if (!p || p.status === 'pending') return '';
+  const week = p.weekly?.[0];
+  const weekLabel = p.weekly?.length > 1 ? `Week, ${week.label.toLowerCase()}` : 'Week';
+  const note = PLAN_NOTE[p.status] ? `<div class="plan-note">${PLAN_NOTE[p.status]}${p.fetchedAt ? `, showing numbers from ${ago(p.fetchedAt)}` : ''}</div>` : '';
+  if (!p.fetchedAt) return `<section class="plan">${note}</section>`;
+  return `<section class="plan">${meter('Session', p.session, 'No active window')}${meter(weekLabel, week)}${note}</section>`;
+}
+
 function renderHome() {
   const list = snap.sessions;
-  const shown = list.slice(0, 5);
+  const shown = list.slice(0, 4);
   const rows = shown.map((s) => `
     <li class="row ${s.status}${alerting(s.id) ? ' alert' : ''}">
       <span class="dot" title="${STATUS[s.status]}"></span>
@@ -69,6 +101,7 @@ function renderHome() {
       <h1>${list.length} Claude session${list.length === 1 ? '' : 's'}${waiting ? `<span class="dim-text">, ${waiting} waiting on you</span>` : ''}</h1>
       <span class="clock">${clock()}</span>
     </header>
+    ${renderPlan()}
     <ul class="rows">${rows}</ul>
     ${list.length > shown.length ? `<div class="more">${list.length - shown.length} more, turn the knob</div>` : ''}
   </section>`;
@@ -132,7 +165,10 @@ function render() {
   screen.className = '';
   if (!connected) { screen.innerHTML = renderMessage('Laptop disconnected', 'Retrying every few seconds'); return; }
   if (!snap) { screen.innerHTML = ''; return; }
-  if (!snap.sessions.length) { screen.innerHTML = renderMessage(clock(), 'No Claude sessions running'); return; }
+  if (!snap.sessions.length) {
+    screen.innerHTML = `<section class="home">${renderMessage(clock(), 'No Claude sessions running')}${renderPlan()}</section>`;
+    return;
+  }
   const s = snap.sessions.find((x) => x.id === nav.sessionId);
   if (nav.view === 'home' || !s) { screen.innerHTML = renderHome(); return; }
   screen.className = `${s.status}${alerting(s.id) ? ' alert' : ''}`;

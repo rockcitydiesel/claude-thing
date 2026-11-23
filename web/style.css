@@ -98,3 +98,16 @@ body.dim #screen { opacity: .35; }
 .message { margin: auto; text-align: center; }
 .message .big { font-size: 64px; font-weight: 700; }
 .message .small { font-size: 26px; color: var(--dim); margin-top: 10px; }
+
+/* Plan usage strip on the home screen */
+.plan { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 12px 0 12px; border-bottom: 1px solid var(--rule); }
+.meter-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 20px; }
+.meter-top .label { font-weight: 600; }
+.meter-top .pct { font-weight: 700; font-size: 24px; }
+.meter-top .pct.red { color: var(--redline); }
+.meter .segments { height: 14px; gap: 2px; margin-top: 5px; grid-template-columns: repeat(25, 1fr); }
+.meter-sub { font-size: 17px; color: var(--dim); margin-top: 4px; }
+.plan-note { grid-column: 1 / -1; font-size: 18px; color: var(--dim); }
+.row { height: 56px; }
+.meter-top { height: 30px; align-items: center !important; }
+.message + .plan { border-bottom: 0; border-top: 1px solid var(--rule); padding-bottom: 0; }
