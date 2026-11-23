@@ -7,6 +7,18 @@ const TYPES = {
   '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml',
 };
 
+// Only answer requests addressed to us by name: blocks DNS-rebinding pages in the
+// laptop's browser from reading session data, and cross-site POSTs.
+const ALLOWED_HOSTS = new Set(['127.0.0.1', 'localhost', '192.168.7.1']);
+const hostOf = (h) => (h ?? '').replace(/:\d+$/, '').toLowerCase();
+
+export function requestAllowed(req) {
+  if (!ALLOWED_HOSTS.has(hostOf(req.headers.host))) return false;
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  try { return ALLOWED_HOSTS.has(new URL(origin).hostname); } catch { return false; }
+}
+
 async function readBody(req, limit = 4096) {
   let body = '';
   for await (const chunk of req) {
@@ -41,6 +53,7 @@ export function createApp({ getSnapshot, focus, webDir }) {
   const status = (res, code) => { res.writeHead(code); res.end(); };
 
   async function handler(req, res) {
+    if (!requestAllowed(req)) return status(res, 403);
     const url = new URL(req.url, 'http://x');
     let pathname;
     try { pathname = decodeURIComponent(url.pathname); } catch { return notFound(res); }

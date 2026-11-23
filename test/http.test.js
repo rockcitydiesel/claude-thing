@@ -20,7 +20,7 @@ async function start(overrides = {}) {
   const server = http.createServer(app.handler);
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   const base = `http://127.0.0.1:${server.address().port}`;
-  return { app, server, base, focused, close: () => { app.close(); server.close(); } };
+  return { app, server, base, focused, close: () => { app.close(); server.closeAllConnections(); server.close(); } };
 }
 
 function post(url, body) {
@@ -68,9 +68,9 @@ test('GET / serves index.html and /web/* static files', async () => {
 
 test('path traversal is rejected', async () => {
   const t = await start();
-  const res = await new Promise((resolve) => http.get(t.base + '/web/../package.json', resolve));
+  const res = await rawGet(t.base, '/web/../package.json');
   assert.equal(res.statusCode, 404);
-  const res2 = await new Promise((resolve) => http.get(t.base + '/web/%2e%2e/%2e%2e/etc/passwd', resolve));
+  const res2 = await rawGet(t.base, '/web/%2e%2e/%2e%2e/etc/passwd');
   assert.equal(res2.statusCode, 404);
   t.close();
 });
@@ -113,4 +113,29 @@ test('POST /action/focus', async () => {
   const t2 = await start({ focusResult: false });
   assert.equal((await post(t2.base + '/action/focus', { sessionId: 's1' })).status, 503);
   t2.close();
+});
+
+function rawGet(base, pathname, headers) {
+  const u = new URL(base);
+  return new Promise((resolve) => http.get({ host: u.hostname, port: u.port, path: pathname, headers, agent: false }, (res) => { res.resume(); resolve(res); }));
+}
+
+test('rejects foreign Host headers (DNS rebinding)', async () => {
+  const t = await start();
+  const port = new URL(t.base).port;
+  try {
+    assert.equal((await rawGet(t.base, '/state', { host: `evil.example:${port}` })).statusCode, 403);
+    assert.equal((await rawGet(t.base, '/state', { host: `localhost:${port}` })).statusCode, 200);
+    assert.equal((await rawGet(t.base, '/state', { host: `192.168.7.1:${port}` })).statusCode, 200);
+  } finally { t.close(); }
+});
+
+test('rejects cross-origin POSTs', async () => {
+  const t = await start();
+  try {
+    const res = await fetch(t.base + '/input', { method: 'POST', headers: { origin: 'https://evil.example' }, body: '{"key":"RIGHT"}' });
+    assert.equal(res.status, 403);
+    const ok = await fetch(t.base + '/input', { method: 'POST', headers: { origin: 'http://192.168.7.1:7777' }, body: '{"key":"RIGHT"}' });
+    assert.equal(ok.status, 204);
+  } finally { t.close(); }
 });
