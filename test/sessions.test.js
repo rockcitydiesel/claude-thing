@@ -54,3 +54,9 @@ test('readAgents reads meta files with finished flags', async () => {
 test('readAgents without subagents dir yields []', async () => {
   assert.deepEqual(await readAgents('/nonexistent-session-dir'), []);
 });
+
+test('transcriptPath replaces every non-alphanumeric character like Claude Code', () => {
+  assert.equal(transcriptPath('/c', '/home/u/code/app/.claude/worktrees/agent-a1', 's'),
+    '/c/projects/-home-u-code-app--claude-worktrees-agent-a1/s.jsonl');
+  assert.equal(transcriptPath('/c', '/home/u/my_app.v2', 's'), '/c/projects/-home-u-my-app-v2/s.jsonl');
+});

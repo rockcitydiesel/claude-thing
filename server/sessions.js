@@ -12,7 +12,8 @@ export function pidMatches(pid, procStart) {
 }
 
 export function transcriptPath(claudeDir, cwd, sessionId) {
-  return path.join(claudeDir, 'projects', cwd.replaceAll('/', '-'), `${sessionId}.jsonl`);
+  // Claude Code maps every non-alphanumeric character (not just '/') to '-'.
+  return path.join(claudeDir, 'projects', cwd.replace(/[^a-zA-Z0-9]/g, '-'), `${sessionId}.jsonl`);
 }
 
 export async function readLiveSessions(claudeDir, isAlive = pidMatches) {

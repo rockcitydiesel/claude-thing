@@ -76,3 +76,34 @@ test('poller never exposes the token in its state', async () => {
   await p.poll(1);
   assert.equal(JSON.stringify(p.current).includes('tok'), false);
 });
+
+const res429 = (retryAfter) => ({ status: 429, headers: { get: (h) => (h.toLowerCase() === 'retry-after' ? retryAfter : null) }, json: async () => ({}) });
+
+test('429 backs off: no further calls until the wait has passed', async () => {
+  let calls = 0;
+  let limited = true;
+  const p = new UsagePoller({ readToken: token(Date.now() + 1e9),
+    fetchImpl: async () => { calls++; return limited ? res429(null) : { status: 200, json: async () => SAMPLE }; } });
+  await p.poll(0);
+  assert.equal(p.current.status, 'rate-limited');
+  await p.poll(60_000);
+  assert.equal(calls, 1);           // still inside the 2-minute backoff
+  limited = false;
+  await p.poll(120_001);
+  assert.equal(calls, 2);
+  assert.equal(p.current.status, 'ok');
+});
+
+test('429 honours Retry-After and doubles the backoff up to 15 minutes', async () => {
+  let calls = 0;
+  const p = new UsagePoller({ readToken: token(Date.now() + 1e9), fetchImpl: async () => { calls++; return res429('600'); } });
+  await p.poll(0);
+  await p.poll(599_000);
+  assert.equal(calls, 1);
+  await p.poll(600_001);
+  assert.equal(calls, 2);
+  const p2 = new UsagePoller({ readToken: token(Date.now() + 1e9), fetchImpl: async () => { calls++; return res429(null); } });
+  let t = 0;
+  for (let i = 0; i < 6; i++) { await p2.poll(t); t = p2.nextAllowedAt; }
+  assert.equal(p2.backoffMs, 15 * 60_000); // 2 → 4 → 8 → 15 (capped)
+});

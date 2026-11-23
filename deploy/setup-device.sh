@@ -19,8 +19,14 @@ if ! "${SSH[@]}" true 2>/dev/null; then
     ssh-copy-id -i "$KEY.pub" -o StrictHostKeyChecking=accept-new "$DEV" </dev/null >/dev/null 2>&1
 fi
 
+# The image ships with America/Los_Angeles; show times in the laptop's zone instead.
+TZ_NAME="$(timedatectl show -p Timezone --value 2>/dev/null || true)"
+
 scp -q -i "$KEY" -o LogLevel=ERROR "$ROOT/device/claude-buttons.py" "$ROOT/device/claude-buttons.service" "$ROOT/device/boot.html" "$DEV:/tmp/"
-"${SSH[@]}" 'set -e
+"${SSH[@]}" "TZ_NAME='$TZ_NAME';"' set -e
+if [ -n "$TZ_NAME" ] && [ -f "/usr/share/zoneinfo/$TZ_NAME" ]; then
+  sudo ln -sf "/usr/share/zoneinfo/$TZ_NAME" /etc/localtime && echo "$TZ_NAME" | sudo tee /etc/timezone >/dev/null
+fi
 sudo install -m 755 /tmp/claude-buttons.py /opt/claude-buttons.py
 sudo install -m 644 /tmp/claude-buttons.service /etc/systemd/system/claude-buttons.service
 sudo install -m 644 /tmp/boot.html /opt/claude-thing-boot.html

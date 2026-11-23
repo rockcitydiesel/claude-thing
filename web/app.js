@@ -74,6 +74,7 @@ const PLAN_NOTE = {
   expired: 'Usage paused: Claude login expired. Open any Claude Code session to renew it.',
   'no-login': 'Usage unavailable: not signed in to Claude Code.',
   error: 'Usage could not be updated',
+  'rate-limited': 'Usage paused briefly (Anthropic rate limit)',
 };
 
 function renderPlan() {
@@ -83,7 +84,7 @@ function renderPlan() {
   const weekLabel = p.weekly?.length > 1 ? `Week, ${week.label.toLowerCase()}` : 'Week';
   const note = PLAN_NOTE[p.status] ? `<div class="plan-note">${PLAN_NOTE[p.status]}${p.fetchedAt ? `, showing numbers from ${ago(p.fetchedAt)}` : ''}</div>` : '';
   if (!p.fetchedAt) return `<section class="plan">${note}</section>`;
-  return `<section class="plan">${meter('Session', p.session, 'No active window')}${meter(weekLabel, week)}${note}</section>`;
+  return `<section class="plan">${meter('Session', p.session, 'No active window')}${meter(weekLabel, week, 'No weekly limit')}${note}</section>`;
 }
 
 function renderHome() {

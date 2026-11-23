@@ -7,7 +7,9 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const USAGE_URL = 'https://api.anthropic.com/api/oauth/usage';
-export const USAGE_POLL_MS = 60_000;
+export const USAGE_POLL_MS = 180_000; // numbers move slowly; the endpoint rate-limits
+const BACKOFF_MIN_MS = 120_000;
+const BACKOFF_MAX_MS = 900_000;
 
 const ts = (s) => (s ? Date.parse(s) : null);
 
@@ -42,9 +44,12 @@ export class UsagePoller {
     this.readToken = readToken;
     this.fetchImpl = fetchImpl;
     this.current = { status: 'pending', session: null, weekly: [], fetchedAt: null };
+    this.nextAllowedAt = 0;
+    this.backoffMs = 0;
   }
 
   async poll(now = Date.now()) {
+    if (now < this.nextAllowedAt) return;
     const keep = { session: this.current.session, weekly: this.current.weekly, fetchedAt: this.current.fetchedAt };
     const tok = await this.readToken();
     if (!tok) { this.current = { ...keep, status: 'no-login' }; return; }
@@ -54,6 +59,15 @@ export class UsagePoller {
         headers: { authorization: `Bearer ${tok.accessToken}`, 'anthropic-beta': 'oauth-2025-04-20' },
         signal: AbortSignal.timeout(10_000),
       });
+      if (res.status === 429) {
+        const retryAfter = Number(res.headers?.get?.('retry-after')) * 1000;
+        this.backoffMs = Math.min(BACKOFF_MAX_MS, this.backoffMs ? this.backoffMs * 2 : BACKOFF_MIN_MS);
+        this.nextAllowedAt = now + (retryAfter > 0 ? retryAfter : this.backoffMs);
+        if (this.lastLogged !== 429) console.error('usage poll: HTTP 429, backing off');
+        this.lastLogged = 429;
+        this.current = { ...keep, status: 'rate-limited' };
+        return;
+      }
       if (res.status !== 200) {
         if (this.lastLogged !== res.status) console.error(`usage poll: HTTP ${res.status}`);
         this.lastLogged = res.status;
@@ -61,6 +75,7 @@ export class UsagePoller {
         return;
       }
       this.lastLogged = 200;
+      this.backoffMs = 0;
       this.current = { status: 'ok', ...parseUsage(await res.json()), fetchedAt: now };
     } catch (err) {
       console.error(`usage poll failed: ${err.name}`);

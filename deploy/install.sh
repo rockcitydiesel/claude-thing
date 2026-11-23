@@ -2,7 +2,10 @@
 # Install the dashboard server as a systemd user service that starts at boot.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-NODE="$(readlink -f "$(command -v node)")" || { echo "Node.js 22+ is required."; exit 1; }
+NODE="$(command -v node)" || { echo "Node.js 22+ is required."; exit 1; }
+# A version manager's per-version path breaks the service after an upgrade; use its shim.
+MISE_SHIM="${MISE_DATA_DIR:-$HOME/.local/share/mise}/shims/node"
+if [[ "$NODE" == */mise/installs/* && -x "$MISE_SHIM" ]]; then NODE="$MISE_SHIM"; fi
 MAJOR="$("$NODE" -p 'process.versions.node.split(".")[0]')"
 (( MAJOR >= 22 )) || { echo "Node.js 22+ is required (found $("$NODE" -v))."; exit 1; }
 
