@@ -16,6 +16,7 @@ async function start(overrides = {}) {
     getSnapshot: () => snap,
     focus: async (pid) => { focused.push(pid); return overrides.focusResult ?? true; },
     webDir,
+    timeMs: overrides.timeMs,
   });
   const server = http.createServer(app.handler);
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
@@ -138,4 +139,23 @@ test('rejects cross-origin POSTs', async () => {
     const ok = await fetch(t.base + '/input', { method: 'POST', headers: { origin: 'http://192.168.7.1:7777' }, body: '{"key":"RIGHT"}' });
     assert.equal(ok.status, 204);
   } finally { t.close(); }
+});
+
+test('snapshot on connect carries the current server time', async () => {
+  const t = await start();
+  const r = await readEvents(t.base, 1);
+  try {
+    const [ev] = await r.next();
+    assert.ok(Math.abs(ev.data.now - Date.now()) < 2000, `now=${ev.data.now}`);
+  } finally { r.cancel(); t.close(); }
+});
+
+test('time events are sent to connected clients', async () => {
+  const t = await start({ timeMs: 20 });
+  const r = await readEvents(t.base, 2);
+  try {
+    const ev = await r.next();
+    assert.equal(ev[1].ev, 'time');
+    assert.ok(Math.abs(ev[1].data - Date.now()) < 2000);
+  } finally { r.cancel(); t.close(); }
 });

@@ -1,4 +1,5 @@
 import { initialNav, onKey, onSnapshot } from './nav.js';
+import { createClock } from './clock.js';
 
 const params = new URLSearchParams(location.search);
 const fixture = params.get('fixture');
@@ -10,7 +11,8 @@ let connected = !!fixture;
 
 const STATUS = { working: 'Working', your_turn: 'Your turn', idle: 'Idle' };
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const now = () => (fixture && snap ? snap.now : Date.now());
+const clockSrc = createClock();
+const now = () => (fixture && snap ? snap.now : clockSrc.now());
 
 function modelName(id) {
   const m = /^claude-([a-z]+)-(\d+)(?:-(\d+))?/.exec(id ?? '');
@@ -51,8 +53,9 @@ function segments(pct, count, cls = 'segments') {
 
 const alerting = (id) => (nav.alerts[id] ?? 0) > now();
 
-function resetsIn(t) {
-  if (!t) return '';
+function resetsIn(raw) {
+  if (!raw) return '';
+  const t = Math.round(raw / 60000) * 60000; // API says 05:59:59.7; show 10 PM, not 9 PM
   const mins = Math.max(0, Math.round((t - now()) / 60000));
   if (mins < 60) return `resets in ${mins}m`;
   if (mins < 24 * 60) return `resets at ${new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
@@ -201,7 +204,13 @@ addEventListener('pointerup', (e) => press(e.clientX < 267 ? 'LEFT' : e.clientX 
 
 function connect() {
   const es = new EventSource('/events');
-  es.addEventListener('snapshot', (e) => { connected = true; applySnapshot(JSON.parse(e.data)); });
+  es.addEventListener('snapshot', (e) => {
+    const next = JSON.parse(e.data);
+    clockSrc.sync(next.now);
+    connected = true;
+    applySnapshot(next);
+  });
+  es.addEventListener('time', (e) => clockSrc.sync(Number(e.data)));
   es.addEventListener('input', (e) => press(JSON.parse(e.data).key));
   es.onopen = () => { connected = true; render(); };
   es.onerror = () => { connected = false; render(); }; // EventSource retries on its own

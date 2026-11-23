@@ -28,14 +28,15 @@ async function readBody(req, limit = 4096) {
   return JSON.parse(body);
 }
 
-export function createApp({ getSnapshot, focus, webDir }) {
+export function createApp({ getSnapshot, focus, webDir, timeMs = 15_000 }) {
   const clients = new Set();
   let lastJson = JSON.stringify(getSnapshot());
   const root = path.resolve(webDir);
 
   const send = (res, event, data) => res.write(`event: ${event}\ndata: ${data}\n\n`);
   const broadcast = (event, data) => { for (const res of clients) send(res, event, data); };
-  const heartbeat = setInterval(() => { for (const res of clients) res.write(': hb\n\n'); }, 15_000);
+  // Doubles as the keep-alive and as the device's clock source.
+  const heartbeat = setInterval(() => broadcast('time', String(Date.now())), timeMs);
   heartbeat.unref();
 
   async function serveFile(res, rel) {
@@ -68,7 +69,7 @@ export function createApp({ getSnapshot, focus, webDir }) {
         res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' });
         clients.add(res);
         req.on('close', () => clients.delete(res));
-        return send(res, 'snapshot', lastJson);
+        return send(res, 'snapshot', JSON.stringify({ ...JSON.parse(lastJson), now: Date.now() }));
       }
       if (req.method === 'POST' && pathname === '/input') {
         let body;
