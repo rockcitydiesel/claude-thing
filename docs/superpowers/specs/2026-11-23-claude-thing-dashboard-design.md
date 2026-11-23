@@ -24,6 +24,23 @@ running — and flip between sessions with the knob.
 - Preset buttons do useful jumps / actions (mapping below).
 - Updates live (≤ ~2 s latency) without touching any Claude Code session.
 - Server starts automatically when the laptop boots — no manual step.
+- Per-session cumulative tokens and **estimated $ cost**, shown everywhere
+  (home list, session screen, detail screen). Includes the session's
+  subagents' usage. Estimate from a per-model price table (input, output,
+  cache write, cache read).
+
+**Display decisions (Vinh, 2026-11-23):**
+- Placement: flat on the desk next to the monitor, landscape, arm's length →
+  flash the **landscape** image; size type for ~60–70 cm viewing.
+- **Home list** is the first knob position: one row per session (status
+  dot, folder, context %, running-agent count, est. $). Turning right goes
+  into per-session screens.
+- Session title: **project folder big**, session name smaller underneath.
+- Alerts: when a session enters YOUR TURN, brighten + pulse an amber border;
+  if the knob/buttons haven't been touched for 30 s, auto-jump to that
+  session.
+- Screen: **always on**, no auto-sleep or auto-dim. (Mic button still
+  toggles a manual dim.)
 
 **Status meaning (decided):** Vinh runs every session with
 `--dangerously-skip-permissions`, so sessions never block on permission
@@ -41,7 +58,8 @@ sessions (`kind` ≠ `interactive`, SDK/headless runs) are hidden.
 
 - Controlling Claude from the device (no approving permissions, no sending
   prompts). Read-only on Claude's side.
-- Usage/billing/rate-limit tracking.
+- Account-level billing or rate-limit tracking (per-session cost estimates
+  ARE in scope, see below).
 - Wi-Fi, music, or any other app on the device. It is a single-purpose
   Claude dashboard.
 - Backing up the stock firmware (Vinh explicitly declined).
@@ -152,11 +170,22 @@ page as a fallback.
 **Page (device)** — single HTML file, plain JS/CSS, dark theme, large type
 readable from arm's length, 800×480 landscape.
 
-Overview screen (one session per screen):
+Home list (knob position 0):
 ```
 ┌──────────────────────────────────────────────┐
-│ ● tempovelo          ops-automation    2 / 3 │
-│ WORKING · opus 5.5            last 12s ago   │
+│ CLAUDE · 3 sessions                   13:21  │
+│ ● tempovelo        61%   ⟳2        $4.12     │
+│ ● claude-thing     34%   ⟳1        $1.08     │
+│ ○ jiffer           12%             $0.31     │
+└──────────────────────────────────────────────┘
+```
+
+Session screen (positions 1..N):
+```
+┌──────────────────────────────────────────────┐
+│ ● tempovelo                            2 / 3 │
+│   ops-automation-approve-gated-agents        │
+│ WORKING · opus 5.5 · $4.12    last 12s ago   │
 │ context ████████████░░░░░░  61%  122k/200k   │
 │ ─ agents (2 running) ─────────────────────── │
 │  ⟳ Explore: find auth middleware      0:42   │
@@ -173,9 +202,9 @@ Server-unreachable state: clear "laptop disconnected" message, auto-retry.
 
 | Input | Action |
 |---|---|
-| Knob turn | previous / next session |
+| Knob turn | previous / next position (home list, then sessions) |
 | Knob press | open detail view |
-| Back | back to overview |
+| Back | detail → session screen; session screen → home list |
 | 1 | jump to next session in YOUR TURN |
 | 2 | jump to busiest session (most running agents) |
 | 3 | jump to most recently active session |
@@ -199,5 +228,7 @@ Server-unreachable state: clear "laptop disconnected" message, auto-retry.
   `shell`) to WORKING / YOUR TURN / IDLE; time-since-turn-end comes from
   `statusUpdatedAt` or the last transcript timestamp.
 - Exact port, file layout, and network-manager config for the RNDIS link.
+- Per-model price table source (pull current prices; keep it in one
+  editable file).
 - Ordering of sessions on the knob (proposal: by project, stable order so
   the knob feels predictable).
