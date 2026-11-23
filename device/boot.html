@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Thing</title>
+<style>
+  html, body { margin: 0; width: 800px; height: 480px; background: #161c23; color: #8794a1;
+    font: 500 28px sans-serif; display: flex; align-items: center; justify-content: center; cursor: none; }
+</style>
+</head>
+<body>
+<p id="msg">Waiting for the laptop</p>
+<script>
+  // Lives on the Car Thing. Waits until the dashboard server on the laptop answers,
+  // then hands over to it, so a boot before the laptop is ready never sticks on an error page.
+  const DASHBOARD = 'http://192.168.7.1:7777/';
+  async function check() {
+    try {
+      await fetch(DASHBOARD + 'web/style.css', { mode: 'no-cors', cache: 'no-store' });
+      location.replace(DASHBOARD);
+    } catch {
+      setTimeout(check, 3000);
+    }
+  }
+  check();
+</script>
+</body>
+</html>
