@@ -12,6 +12,9 @@ IMAGE="$(find "$ROOT/.tools/image" -mindepth 1 -maxdepth 1 -type d -name 'debian
 [[ -x "$PY" && -f "$TOOL" ]] || { echo "Missing .tools/venv or superbird-tool; run the prep steps first."; exit 1; }
 [[ -n "$IMAGE" && -f "$IMAGE/system_a.ext2" ]] || { echo "Extracted landscape image not found under .tools/image/"; exit 1; }
 
+# superbird-tool opens images/*.bin relative to its own directory.
+cd "$(dirname "$TOOL")"
+
 echo "Looking for the Car Thing (hold buttons 1+4 while plugging in, no USB hub)..."
 OUT="$("$PY" "$TOOL" --find_device 2>&1 || true)"
 echo "$OUT"
