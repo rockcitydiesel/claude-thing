@@ -16,9 +16,9 @@ IMAGE="$(find "$ROOT/.tools/image" -mindepth 1 -maxdepth 1 -type d -name 'debian
 cd "$(dirname "$TOOL")"
 
 # Partition erases take longer than pyusb's 1 s default read timeout (worse behind a
-# USB hub), which aborts the flash with USBTimeoutError. Give erases 60 s.
+# USB hub), which aborts the flash with USBTimeoutError. Give storage (amlmmc) commands 60 s.
 if ! grep -q "CLAUDE_THING_ERASE_TIMEOUT" superbird_device.py; then
-  sed -i 's/resp = self.device.bulkCmd(command)/resp = self.device.bulkCmd(command, timeout=(60000 if "erase" in command else None))  # CLAUDE_THING_ERASE_TIMEOUT/' superbird_device.py
+  sed -i 's/resp = self.device.bulkCmd(command)/resp = self.device.bulkCmd(command, timeout=(60000 if command.startswith("amlmmc") else None))  # CLAUDE_THING_ERASE_TIMEOUT/' superbird_device.py
 fi
 grep -q "CLAUDE_THING_ERASE_TIMEOUT" superbird_device.py || { echo "Could not apply erase-timeout patch"; exit 1; }
 
