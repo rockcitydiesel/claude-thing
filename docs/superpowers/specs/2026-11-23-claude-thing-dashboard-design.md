@@ -29,6 +29,14 @@ running — and flip between sessions with the knob.
   subagents' usage. Estimate from a per-model price table (input, output,
   cache write, cache read).
 
+**Plan usage (added by Vinh, 2026-11-23 14:12):** the home screen shows
+two bars, **Session** (5-hour window) and **Week**, each with % used and
+reset time, matching Claude Code's `/usage`. Source: `GET
+https://api.anthropic.com/api/oauth/usage` once a minute with the OAuth
+access token from `~/.claude/.credentials.json` (Vinh chose this over the
+stale cache in `~/.claude.json`). The token is read fresh each poll, never
+refreshed by the server, and never leaves the laptop except to Anthropic.
+
 **Display decisions (Vinh, 2026-11-23):**
 - Placement: flat on the desk next to the monitor, landscape, arm's length →
   flash the **landscape** image; size type for ~60–70 cm viewing.
@@ -58,8 +66,7 @@ sessions (`kind` ≠ `interactive`, SDK/headless runs) are hidden.
 
 - Controlling Claude from the device (no approving permissions, no sending
   prompts). Read-only on Claude's side.
-- Account-level billing or rate-limit tracking (per-session cost estimates
-  ARE in scope, see below).
+- Account-level billing (per-session cost estimates ARE in scope, see below).
 - Wi-Fi, music, or any other app on the device. It is a single-purpose
   Claude dashboard.
 - Backing up the stock firmware (Vinh explicitly declined).
