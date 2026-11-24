@@ -124,8 +124,20 @@ function gauge(s) {
     <span>active ${ago(s.lastActivity)}</span></div></div>`;
 }
 
+// What the main thread is doing: its latest tool call while working, else its status.
+function mainLine(s) {
+  const t = s.status === 'working' ? s.recentTools.at(-1) : null;
+  return t ? `<span class="tname">${esc(t.name)}</span> ${esc(t.summary)}` : esc(STATUS[s.status]);
+}
+
+function threadsTitle(s) {
+  const n = s.agents.length;
+  return n ? `Main thread + ${n} agent${n > 1 ? 's' : ''}` : 'Main thread';
+}
+
 function renderSession(s) {
-  const max = 4;
+  const max = 3;
+  const main = `<div class="agent main"><span class="ellipsis"><span class="type">main</span> ${mainLine(s)}</span><span class="time">${ago(s.lastActivity)}</span></div>`;
   const agents = s.agents.slice(0, max).map((a) => `
     <div class="agent"><span class="ellipsis"><span class="type">${esc(shortType(a.type))}</span> ${esc(a.description)}</span><span class="time">${elapsed(a.startedAt)}</span></div>`).join('');
   return `<div class="lamp"></div><section class="body">
@@ -134,16 +146,18 @@ function renderSession(s) {
       <span>${esc(modelName(s.model))}</span><span class="cost">${usd(s.cost.usd)}</span></div>
     ${gauge(s)}
     <div class="agents">
-      ${s.agents.length ? `<h2>${s.agents.length} agent${s.agents.length > 1 ? 's' : ''} running</h2>${agents}
-        ${s.agents.length > max ? `<div class="more">+${s.agents.length - max} more, press the knob</div>` : ''}`
-        : `<p class="quiet">No agents running</p>`}
+      <h2>${threadsTitle(s)}</h2>${main}${agents}
+      ${s.agents.length > max ? `<div class="more">+${s.agents.length - max} more, press the knob</div>` : ''}
     </div></section>`;
 }
 
 const shortType = (t) => (t ?? '').split(':').pop();
 
 function renderDetail(s) {
-  const agents = s.agents.slice(0, 5).map((a) => `
+  const main = `
+    <div class="d-agent main"><div class="line1 ellipsis">${mainLine(s)}</div>
+    <div class="line2"><span>main</span><span>${s.context.pct}% context</span><span>active ${ago(s.lastActivity)}</span></div></div>`;
+  const agents = main + s.agents.slice(0, 3).map((a) => `
     <div class="d-agent"><div class="line1 ellipsis">${esc(a.description || shortType(a.type))}</div>
     <div class="line2"><span>${esc(shortType(a.type))}</span><span>${a.context.pct}% context</span><span>${elapsed(a.startedAt)}</span><span>active ${ago(a.lastActivity)}</span></div></div>`).join('');
   const tools = [...s.recentTools].reverse().map((t) => `
@@ -152,7 +166,7 @@ function renderDetail(s) {
   return `<div class="lamp"></div><section class="body">
     ${sessionHeader(s)}
     <div class="detail-grid">
-      <div><h2>Agents</h2>${agents || '<p class="quiet">No agents running</p>'}</div>
+      <div><h2>${threadsTitle(s)}</h2>${agents}</div>
       <div><h2>Recent tool calls</h2>${tools || '<p class="quiet">None yet</p>'}</div>
     </div>
     <div class="tokens"><span><b>${usd(s.cost.usd)}</b> estimated</span><span>in <b>${kTokens(t.input)}</b></span><span>out <b>${kTokens(t.output)}</b></span>

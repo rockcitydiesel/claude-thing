@@ -111,3 +111,4 @@ body.dim #screen { opacity: .35; }
 .row { height: 56px; }
 .meter-top { height: 30px; align-items: center !important; }
 .message + .plan { border-bottom: 0; border-top: 1px solid var(--rule); padding-bottom: 0; }
+.agent.main .tname, .d-agent.main .tname { color: var(--ink); font-weight: 600; }
